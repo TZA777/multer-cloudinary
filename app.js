@@ -20,9 +20,9 @@ const listingRoutes = require("./routes/listingRoutes");
 const app = express();
 
 // ---------------- DB ----------------
-mongoose.connect(process.env.MONGO_ATLAS_URL)
-    .then(() => console.log("DB connected"))
-    .catch(err => console.log(err));
+// mongoose.connect(process.env.MONGO_ATLAS_URL)
+//     .then(() => console.log("DB connected"))
+//     .catch(err => console.log(err));
 
 // ---------------- VIEW ----------------
 app.engine("ejs", engine);
@@ -41,6 +41,17 @@ app.use((err, req, res, next) => {
     res.status(500).send(`Something broke! ${err.message}`);
 });
 
-app.listen(PORT, () => {
-    console.log("Server running on port 3000");
-});
+
+//data base is connected and then server starts, if server starts before db connection, may result in error related to database
+mongoose.connect(process.env.MONGO_ATLAS_URL)
+    .then(() => {
+        console.log("✅ DB connected");
+
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+
+    })
+    .catch(err => {
+        console.log("❌ DB connection error:", err);
+    });
